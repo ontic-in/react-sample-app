@@ -18,6 +18,8 @@ function App() {
         >
           Learn React
         </a>
+        <div>{process.env.REACT_APP_ENVIRONMENT_VARIABLE_1}</div>
+        <div>{process.env.REACT_APP_ENVIRONMENT_VARIABLE_2}</div>
       </header>
     </div>
   )
