@@ -15,6 +15,9 @@ jobs:
         run: |
           npm install
       - name: Production Build
+        env:
+          REACT_APP_ENVIRONMENT_VARIABLE_1: ${{ secrets.REACT_APP_ENVIRONMENT_VARIABLE_1 }}
+          REACT_APP_ENVIRONMENT_VARIABLE_2: ${{ secrets.REACT_APP_ENVIRONMENT_VARIABLE_2 }}
         run: |
           npm run build
       - name: Deploy to S3
