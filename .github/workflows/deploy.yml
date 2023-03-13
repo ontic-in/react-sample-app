@@ -1,46 +1,36 @@
-name: 'Amplify Deploy'
-on: [push]
-
+name: Production Build
+on:
+  pull_request:
+  push:
+    branches:
+      - master
 jobs:
-  test:
-    name: test amplify-cli-action
+  build:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [14, 16, 18]
 
     steps:
-      - uses: actions/checkout@v1
-
-      - name: use node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: configure amplify
-        uses: AresFitness/amplify-cli-action@0.4.5
-        with:
-          amplify_command: configure
-          amplify_env: main
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-
-      - name: install, build and test
+      - name: Yarn Install
         run: |
-          npm install
-          # build and test
-          # npm run build
-          # npm run test
-
-      - name: deploy
-        uses: AresFitness/amplify-cli-action@0.4.5
+          yarn install
+      - name: Production Build
+        run: |
+          yarn build
+      - name: Deploy to S3
+        uses: jakejarvis/s3-sync-action@master
         with:
-          amplify_command: publish
-          amplify_env: main
+          args: --acl public-read --delete
         env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_PRODUCTION_BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
+          SOURCE_DIR: 'build'
