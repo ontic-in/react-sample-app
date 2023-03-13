@@ -4,22 +4,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [14, 16, 18]
-
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Yarn Install
+          node-version: 16
+          cache: 'npm'
+      - name: Npm Install
         run: |
-          yarn install
+          npm install
       - name: Production Build
         run: |
-          yarn build
+          npm run build
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@master
         with:
